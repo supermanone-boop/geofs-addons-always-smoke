@@ -1,13 +1,1 @@
-  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲bookmarklet.js  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲  𝓟𝓱𝓸𝓽𝓸
-𝓫𝔂 𝓓𝓪𝓲𝓴𝓲
+javascript:(function(){let wait=setInterval(()=>{if(!window.geofs||!geofs.aircraft||!geofs.aircraft.instance||!geofs.aircraft.instance.object3d)return;clearInterval(wait);initSmoke()},500);function initSmoke(){const aircraft=geofs.aircraft.instance;const obj=aircraft.object3d;let smoke=new geofs.fx.ParticleEmitter({anchor:{worldPosition:[0,0,0]},rate:.08,life:6e4,startScale:.003,endScale:2,startOpacity:.8,endOpacity:0,texture:"whitesmoke"});const BACK=-6;const DOWN=-1;geofs.animation.frameCallbacks.push(()=>{if(!obj||!smoke)return;let pos=new THREE.Vector3;let quat=new THREE.Quaternion;obj.getWorldPosition(pos);obj.getWorldQuaternion(quat);let offset=new THREE.Vector3(0,DOWN,BACK);offset.applyQuaternion(quat);pos.add(offset);smoke.setAnchor({worldPosition:[pos.x,pos.y,pos.z]})});console.log("Always-on realistic smoke enabled");ui.notification.show("Smoke ACTIVE")}})();
