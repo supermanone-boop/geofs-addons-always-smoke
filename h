@@ -3,57 +3,57 @@
 (() => {
 
 let activeSmoke = null;
-let colorLoop = null;
+let interval = null;
 
-// =====================================================
-// UI作成（右上）
-// =====================================================
+const btn = document.createElement("button");
 
-const ui = document.createElement("div");
+btn.innerText = "DUST OFF";
 
-Object.assign(ui.style, {
+Object.assign(btn.style, {
     position: "fixed",
     top: "10px",
     right: "10px",
     zIndex: 99999,
-    background: "rgba(0,0,0,0.6)",
-    padding: "8px",
-    borderRadius: "8px",
+    padding: "6px 10px",
+    background: "#222",
     color: "#fff",
-    fontSize: "12px",
-    fontFamily: "sans-serif",
-    width: "140px"
+    border: "1px solid #555",
+    borderRadius: "6px",
+    cursor: "pointer"
 });
 
-ui.innerHTML = `
-<div style="margin-bottom:6px;">BROWN SMOKE</div>
-<button id="toggle" style="
-    width:100%;
-    padding:6px;
-    background:#333;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-">OFF</button>
-`;
+document.body.appendChild(btn);
 
-document.body.appendChild(ui);
-
-// =====================================================
-// スモークON
-// =====================================================
-
-function startSmoke() {
+function toggleDust() {
 
     const ac = geofs?.aircraft?.instance;
 
     if (!ac || !ac.engines) {
-        console.warn("Aircraft not ready");
+        console.warn("Aircraft not ready yet.");
         return;
     }
 
-    const brown = new Cesium.Color(0.45, 0.25, 0.10, 1.0);
+    // OFF
+    if (activeSmoke) {
+
+        activeSmoke.forEach(e => e.destroy?.());
+        activeSmoke = null;
+
+        if (interval) {
+            clearInterval(interval);
+            interval = null;
+        }
+
+        btn.innerText = "DUST OFF";
+        console.log("[Dust] stopped");
+        return;
+    }
+
+    // =====================================================
+    // 土煙カラー（ここがポイント）
+    // =====================================================
+
+    const dustColor = new Cesium.Color(0.55, 0.45, 0.30, 1.0);
 
     activeSmoke = [];
 
@@ -61,80 +61,47 @@ function startSmoke() {
 
         const emitter = new geofs.fx.ParticleEmitter({
 
-            anchor: engine.points?.contrailAnchor || {
-                worldPosition: engine.object3d.worldPosition
-            },
+            anchor:
+                engine.points?.contrailAnchor ||
+                { worldPosition: engine.object3d.worldPosition },
 
             duration: 1e10,
-            rate: 0.05,
-            life: 2500,
+            rate: 0.08,
 
-            startScale: 0.01,
-            endScale: 0.12,
+            life: 3000,
 
-            randomizeStartScale: 0.01,
-            randomizeEndScale: 0.2,
+            startScale: 0.05,
+            endScale: 1.5,
 
-            startOpacity: 1,
-            endOpacity: 0.2,
+            randomizeStartScale: 0.02,
+            randomizeEndScale: 0.5,
+
+            startOpacity: 0.9,
+            endOpacity: 0.0,
 
             startRotation: "random",
-            texture: "smoke",
 
-            velocity: new Cesium.Cartesian3(0, 0, 1000)
+            texture: "whitesmoke", // ←これ固定（GeoFS仕様）
+
+            velocity: new Cesium.Cartesian3(0, 0, 30) // ゆっくり舞う＝土煙っぽさ
 
         });
 
         activeSmoke.push(emitter);
     });
 
-    // 色ループ（1回だけ）
-    colorLoop = setInterval(() => {
-        geofs.fx.setParticlesColor(brown);
+    // 色を“土色固定”
+    interval = setInterval(() => {
+        geofs.fx.setParticlesColor(dustColor);
     }, 50);
 
-    console.log("[Smoke] BROWN ON");
+    btn.innerText = "DUST ON";
+
+    console.log("[Dust] ON");
 }
 
-// =====================================================
-// スモークOFF
-// =====================================================
+btn.addEventListener("click", toggleDust);
 
-function stopSmoke() {
-
-    if (activeSmoke) {
-        activeSmoke.forEach(e => e.destroy?.());
-        activeSmoke = null;
-    }
-
-    if (colorLoop) {
-        clearInterval(colorLoop);
-        colorLoop = null;
-    }
-
-    console.log("[Smoke] OFF");
-}
-
-// =====================================================
-// toggle
-// =====================================================
-
-function toggle() {
-
-    const btn = document.getElementById("toggle");
-
-    if (!activeSmoke) {
-        startSmoke();
-        btn.innerText = "ON";
-    } else {
-        stopSmoke();
-        btn.innerText = "OFF";
-    }
-}
-
-document.getElementById("toggle")
-    .addEventListener("click", toggle);
-
-console.log("[UI Smoke] READY");
+console.log("[GeoFS DUST READY]");
 
 })();
